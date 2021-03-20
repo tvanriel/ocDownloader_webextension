@@ -8,89 +8,75 @@
  * @copyright Xavier Beurois 2015
  */
 
-function EndsWith (String, LookingFor)
-{
-    return String.indexOf (LookingFor, String.length - LookingFor.length) !== -1;
+
+function sendNotification(Message) {
+    chrome.notifications.create('ocDownloader',
+        {
+            type: 'basic',
+            title: 'ocDownloader',
+            iconUrl: '../img/icon-64.png',
+            message: Message
+        }, function (iD) {
+            setTimeout(function () {
+                chrome.notifications.clear('ocDownloader', function () {
+                    return;
+                });
+            }, 4000);
+        });
 }
 
-function NotifyMe (Message)
-{
-	chrome.notifications.create ('ocDownloader',
-	{
-		type: 'basic',
-		title: 'ocDownloader',
-    	iconUrl: '../img/icon-64.png',
-      	message: Message
-    }, function (iD)
-	{
-		setTimeout (function (){
-	  		chrome.notifications.clear ('ocDownloader', function ()
-			{
-				return;
-			});
-		}, 4000);
-	});
+function ocUrl(url, method) {
+    if (!url.endsWith('/')) {
+        url += '/';
+    }
+    url = url + 'index.php/apps/ocdownloader/api/' + method + '?format=json';
+
+    return url.substr(0, url.indexOf(':')) + '://' + url.substr(url.indexOf('/') + 2);
 }
 
-function MakeOCURL (URL, Method)
-{
-	if (!EndsWith (URL, '/'))
-	{
-		URL += '/';
+function downloadLink(info) {
+	if ('srcUrl' in info) {
+		sendApiRequest(info.srcUrl);
+	} else if ('linkUrl' in info) {
+		sendApiRequest(info.linkUrl);
 	}
-	URL = URL + 'index.php/apps/ocdownloader/api/' + Method + '?format=json';
-	
-	return URL.substr (0, URL.indexOf(':')) + '://' + URL.substr (URL.indexOf('/') + 2);
 }
 
-function OnClickHandler (Info, Tab)
-{
-	chrome.storage.local.get (['OCUrl', 'Username', 'Passwd'], function (Items)
-	{
-		var XHR = new XMLHttpRequest ();
-		XHR.open ('POST', MakeOCURL (Items.OCUrl, 'add'), true);
-		XHR.setRequestHeader ('OCS-APIREQUEST', 'true');
-		XHR.setRequestHeader ('Content-type', 'application/x-www-form-urlencoded');
-		XHR.setRequestHeader ('Authorization', 'Basic ' + btoa(Items.Username + ':' + Items.Passwd));
-		XHR.onreadystatechange = function ()
-		{
-			if (XHR.readyState == 4)
-			{
-				try
-				{
-			    	var OCS = JSON.parse (XHR.responseText);
-					console.log (XHR.responseText);
+function sendApiRequest(link) {
+    chrome.storage.local.get(['OCUrl', 'Username', 'Passwd'], function (items) {
+        let XHR = new XMLHttpRequest();
+        XHR.open('POST', ocUrl(items.OCUrl, 'add'), true);
+        XHR.setRequestHeader('OCS-APIREQUEST', 'true');
+        XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        XHR.setRequestHeader('Authorization', 'Basic ' + btoa(items.Username + ':' + items.Passwd));
+        XHR.onreadystatechange = function () {
+            if (XHR.readyState === 4) {
+                try {
+                    let OCS = JSON.parse(XHR.responseText);
+                    console.log(XHR.responseText);
 
-					if (XHR.status == 200)
-					{
-						if (!OCS.ERROR)
-						{
-							NotifyMe (chrome.i18n.getMessage ('Downloadlaunchedonyourserver') + ': ' + OCS.FILENAME);
-						}
-						else
-						{
-							NotifyMe (chrome.i18n.getMessage (OCS.MESSAGE));
-						}
-					}
-					else
-					{
-						NotifyMe (chrome.i18n.getMessage ('Unabletoreachyourserver'));
-					}
-				}
-				catch (E)
-				{
-					NotifyMe (chrome.i18n.getMessage ('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
-					console.log (E.message);
-				}
-		  	}
-		}
-		XHR.send('URL=' + encodeURIComponent (Info.linkUrl));
-	});
+                    if (XHR.status == 200) {
+                        if (!OCS.ERROR) {
+                            sendNotification(chrome.i18n.getMessage('Downloadlaunchedonyourserver') + ': ' + OCS.FILENAME);
+                        } else {
+                            sendNotification(chrome.i18n.getMessage(OCS.MESSAGE));
+                        }
+                    } else {
+                        sendNotification(chrome.i18n.getMessage('Unabletoreachyourserver'));
+                    }
+                } catch (E) {
+                    sendNotification(chrome.i18n.getMessage('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
+                    console.log(E.message);
+                }
+            }
+        }
+        XHR.send('URL=' + encodeURIComponent(link));
+    });
 }
 
-chrome.contextMenus.create ({
-	'title': chrome.i18n.getMessage('DownloadWithocDownloader'),
-	'contexts': ['link']
+chrome.contextMenus.create({
+    'title': chrome.i18n.getMessage('DownloadWithocDownloader'),
+    'contexts': ['link','image']
 });
 
-chrome.contextMenus.onClicked.addListener (OnClickHandler);
+chrome.contextMenus.onClicked.addListener(downloadLink);

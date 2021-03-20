@@ -8,154 +8,152 @@
  * @copyright Xavier Beurois 2015
  */
 
-var Manifest = chrome.runtime.getManifest ();
-var NeededAPIVersion = Manifest.version;
+let manifest = chrome.runtime.getManifest();
+let neededApiVersion = manifest.version;
 
-function StartsWith (String, LookingFor, Position)
-{
-   	Position = Position || 0;
-   	return String.indexOf (LookingFor, Position) === Position;
+function startsWith(String, LookingFor, Position) {
+    Position = Position || 0;
+    return String.indexOf(LookingFor, Position) === Position;
 }
 
-function EndsWith (String, LookingFor)
-{
-    return String.indexOf (LookingFor, String.length - LookingFor.length) !== -1;
+function endsWith(String, LookingFor) {
+    return String.indexOf(LookingFor, String.length - LookingFor.length) !== -1;
 }
 
-function NotifyMe (Message)
-{
-	chrome.notifications.create ('ocDownloader',
-	{
-		type: 'basic',
-		title: 'ocDownloader',
-    	iconUrl: '../img/icon-64.png',
-      	message: Message
-    }, function (iD)
-	{
-		setTimeout (function (){
-	  		chrome.notifications.clear ('ocDownloader', function ()
-			{
-				return;
-			});
-		}, 4000);
-	});
+function notifyMe(Message) {
+    chrome.notifications.create('ocDownloader',
+        {
+            type: 'basic',
+            title: 'ocDownloader',
+            iconUrl: '../img/icon-64.png',
+            message: Message
+        }, function () {
+            setTimeout(function () {
+                chrome.notifications.clear('ocDownloader', function () {
+                    return;
+                });
+            }, 4000);
+        });
 }
 
-function MakeOCURL (URL, Method)
-{
-	if (!EndsWith (URL, '/'))
-	{
-		URL += '/';
-	}
-	URL = URL + 'index.php/apps/ocdownloader/api/' + Method + '?format=json';
-	
-	return URL.substr (0, URL.indexOf(':')) + '://' + URL.substr (URL.indexOf('/') + 2);
+function makeOCURL(URL, Method) {
+    if (!endsWith(URL, '/')) {
+        URL += '/';
+    }
+    URL = URL + 'index.php/apps/ocdownloader/api/' + Method + '?format=json';
+
+    return URL.substr(0, URL.indexOf(':')) + '://' + URL.substr(URL.indexOf('/') + 2);
 }
 
-function ValidURL (URLString)
-{
-	return /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(URLString);
+function validURL(URLString) {
+    return /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(URLString);
 }
 
-function SaveConnectionData ()
-{
-	var URL = document.getElementById ('ocurltf').value.trim ();
-	var Username = document.getElementById ('usernametf').value.trim ();
-	var Passwd = document.getElementById ('passwdtf').value.trim ();
-	
-	if (URL.length > 0 && Username.length > 0 && Passwd.length > 0)
-	{
-		document.getElementById ('messagep').textContent = '';
-		document.getElementById ('messagep').style.display = 'none';
-		
-		if (!ValidURL (document.getElementById ('ocurltf').value) || !(StartsWith (document.getElementById ('ocurltf').value, 'http') || StartsWith (document.getElementById ('ocurltf').value, 'https')))
-		{
-			document.getElementById ('messagep').textContent = chrome.i18n.getMessage ('InvalidURL');
-			document.getElementById ('messagep').style.display = 'block';
-		}
-		else
-		{
-			document.getElementById ('messagep').textContent = chrome.i18n.getMessage ('Datasaved');
-			document.getElementById ('messagep').style.display = 'block';
-			
-			chrome.storage.local.set ({
-				'OCUrl': URL,
-				'Username': Username,
-				'Passwd': Passwd
-			}, function (){
-				var XHR = new XMLHttpRequest ();
-				XHR.open ('POST', MakeOCURL (URL, 'version'), true);
-				XHR.setRequestHeader ('OCS-APIREQUEST', 'true');
-				XHR.setRequestHeader ('Content-type', 'application/x-www-form-urlencoded');
-				XHR.setRequestHeader ('Authorization', 'Basic ' + btoa(Username + ':' + Passwd));
-				XHR.onreadystatechange = function ()
-				{
-					if (XHR.readyState == 4)
-					{
-						try
-						{
-					    	var OCS = JSON.parse (XHR.responseText);
-							console.log (XHR.responseText);
-							
-							if (XHR.status == 200)
-							{
-								if (OCS.RESULT)
-								{
-									NotifyMe (chrome.i18n.getMessage ('VersionOK'));
-								}
-								else
-								{
-									NotifyMe (chrome.i18n.getMessage ('VersionNOK'));
-								}
-							}
-							else
-							{
-								NotifyMe (chrome.i18n.getMessage ('Unabletoreachyourserver'));
-							}
-						}
-						catch (E)
-						{
-							NotifyMe (chrome.i18n.getMessage ('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
-							console.log (E.message);
-						}
-				  	}
-				}
-				XHR.send('AddonVersion=' + NeededAPIVersion);
-			});
-		}
-	}
+function saveConnectionData(url,username, password) {
+    if (url.length > 0 && username.length > 0 && password.length > 0) {
+        document.getElementById('messagep').textContent = '';
+        document.getElementById('messagep').style.display = 'none';
+
+        if (!validURL(document.getElementById('ocurltf').value) || !(startsWith(document.getElementById('ocurltf').value, 'http') || startsWith(document.getElementById('ocurltf').value, 'https'))) {
+            document.getElementById('messagep').textContent = chrome.i18n.getMessage('InvalidURL');
+            document.getElementById('messagep').style.display = 'block';
+        } else {
+            document.getElementById('messagep').textContent = chrome.i18n.getMessage('Datasaved');
+            document.getElementById('messagep').style.display = 'block';
+
+            chrome.storage.local.set({
+                'OCUrl': url,
+                'Username': username,
+                'Passwd': password
+            }, function () {
+                let XHR = new XMLHttpRequest();
+                XHR.open('POST', makeOCURL(url, 'version'), true);
+                XHR.setRequestHeader('OCS-APIREQUEST', 'true');
+                XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                XHR.setRequestHeader('Authorization', 'Basic ' + btoa(username + ':' + password));
+                XHR.onreadystatechange = function () {
+                    if (XHR.readyState == 4) {
+                        try {
+							let OCS = JSON.parse(XHR.responseText);
+                            console.log(XHR.responseText);
+
+                            if (XHR.status == 200) {
+                                if (OCS.RESULT) {
+                                    notifyMe(chrome.i18n.getMessage('VersionOK'));
+                                } else {
+                                    notifyMe(chrome.i18n.getMessage('VersionNOK'));
+                                }
+                            } else {
+                                notifyMe(chrome.i18n.getMessage('Unabletoreachyourserver'));
+                            }
+                        } catch (E) {
+                            notifyMe(chrome.i18n.getMessage('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
+                            console.log(E.message);
+                        }
+                    }
+                };
+                XHR.send('AddonVersion=' + neededApiVersion);
+            });
+        }
+    }
 }
 
 // Execute when loading extension html page
-window.onload = function ()
-{
-	chrome.storage.local.get (['OCUrl', 'Username', 'Passwd'], function (Items)
-	{
-		document.getElementById ('ocurltf').placeholder = chrome.i18n.getMessage ('ownCloudURL');
-		document.getElementById ('ocurltflbl').textContent = chrome.i18n.getMessage ('ownCloudURL');
-		
-		document.getElementById ('usernametf').placeholder = chrome.i18n.getMessage ('Username');
-		document.getElementById ('usernametflbl').textContent = chrome.i18n.getMessage ('Username');
-		
-		document.getElementById ('passwdtf').placeholder = chrome.i18n.getMessage ('Password');
-		document.getElementById ('passwdtflbl').textContent = chrome.i18n.getMessage ('Password');
-		
-		if (Items.OCUrl != undefined)
-		{
-			document.getElementById ('ocurltf').value = Items.OCUrl;
-		}
-		
-		if (Items.Username != undefined)
-		{
-			document.getElementById ('usernametf').value = Items.Username;
-		}
-		
-		if (Items.Passwd != undefined)
-		{
-			document.getElementById ('passwdtf').value = Items.Passwd;
-		}
-	});
-	
-	document.getElementById ('savebtn').value = chrome.i18n.getMessage ('Save');
-	document.getElementById ('savebtn').addEventListener("click", SaveConnectionData);
-}
+document.addEventListener('readystatechange', ev => {
+    // Wait for the page to be ready
+    if (document.readyState !== "interactive") return;
+
+    let labels = {
+        url: document.getElementById('ocurltflbl'),
+        username: document.getElementById('usernametflbl'),
+        password: document.getElementById('passwdtflbl'),
+    };
+
+    let inputs = {
+        url: document.getElementById('ocurltf'),
+        username: document.getElementById('usernametf'),
+        password: document.getElementById('passwdtf'),
+    };
+    inputs.url.placeholder = chrome.i18n.getMessage('ownCloudURL');
+    labels.url.textContent = chrome.i18n.getMessage('ownCloudURL');
+
+    inputs.username.placeholder = chrome.i18n.getMessage('Username');
+    labels.username.textContent = chrome.i18n.getMessage('Username');
+
+    inputs.password.placeholder = chrome.i18n.getMessage('Password');
+    labels.password.textContent = chrome.i18n.getMessage('Password');
+
+
+    // Load the credentials from local storage.
+    chrome.storage.local.get(['OCUrl', 'Username', 'Passwd'], items => {
+
+        if (items.OCUrl !== undefined) {
+			inputs.url.value = items.OCUrl;
+        }
+
+        if (items.Username !== undefined) {
+			inputs.username.value = items.Username;
+        }
+
+        if (items.Passwd !== undefined) {
+			inputs.password.value = items.Passwd;
+        }
+
+        // Save the username and password.  So they will be saved when you tab away to a password manager.
+		let quickSave = () => {
+        	chrome.storage.local.set({
+				'OCUrl': inputs.url.value,
+				'Username': inputs.username.value,
+				'Passwd': inputs.password.value
+			});
+		};
+
+        inputs.url.addEventListener('input', quickSave);
+        inputs.username.addEventListener('input', quickSave);
+        inputs.password.addEventListener('input', quickSave);
+
+    });
+
+    document.getElementById('savebtn').value = chrome.i18n.getMessage('Save');
+    document.getElementById('savebtn').addEventListener("click", () => saveConnectionData(inputs.url.value, inputs.username.value, inputs.password.value));
+});
