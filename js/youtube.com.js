@@ -71,7 +71,7 @@ function main() {
         'paper-button',
         {
             id: 'ocDownloader_webextension_DownloadButton',
-            style: 'background-color: var(--yt-spec-brand-button-background); height: 100%; color: var(--yt-spec-static-brand-white); border: none; border-radius: 2px; cursor: pointer; font-size: var(--ytd-tab-system_-_font-size); font-family: var(--paper-font-common-base_-_font-family)',
+            style: 'margin-top: 13px; background-color: var(--yt-spec-brand-button-background); height: 100%; color: var(--yt-spec-static-brand-white); border: none; border-radius: 2px; cursor: pointer; font-size: var(--ytd-tab-system_-_font-size); font-family: var(--paper-font-common-base_-_font-family)',
         },
         [
             h(
@@ -90,26 +90,27 @@ function main() {
 
     // We need to wait for the document to be loaded and have the parent element.
     const waiter = setInterval(() => {
+        console.log('try show button');
         tries -= 1;
         if (tries <= 0) {
             clearInterval(waiter);
         }
 
-        const buttonBar = document.getElementById('top-level-buttons');
+        const buttonBar = document.getElementById('info');
+        console.log(buttonBar);
         if (buttonBar === null) return;
         clearInterval(waiter);
 
         buttonBar.appendChild(dlBtn);
-        // When navigating to a new video, the page gets destroyed but we need to re-run the script.
-        // So here we wait for the button to be gone from the page so we can re-add it.
-        const waitForRemove = window.setInterval(() => {
-            const el = document.getElementById('ocDownloader_webextension_DownloadButton');
-            if (el === null) {
-                clearInterval(waitForRemove);
-                main();
-            }
-        }, 3000);
     }, 500);
 }
 
-main();
+window.setInterval(() => {
+    if (window.location.pathname !== "/watch") {
+        return;
+    }
+    if (document.getElementById('ocDownloader_webextension_DownloadButton') !== null) {
+        return;
+    }
+    main();
+}, 3000)
