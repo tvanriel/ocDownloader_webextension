@@ -1,0 +1,70 @@
+{
+	"Name":
+	{
+		"message": "ocDownloader"
+	},
+	"Description":
+	{
+		"message": "Met deze extensie kan je een download link meteen naar ocDownloader sturen door er met de rechtermuisknop op te drukken"
+	},
+	"ownCloudURL":
+	{
+		"message": "ownCloud URL"
+	},
+	"Username":
+	{
+		"message": "Gebruikersnaam"
+	},
+	"Password":
+	{
+		"message": "Wachtwoord"
+	},
+	"Save":
+	{
+		"message": "Opslaan"
+	},
+	"InvalidURL":
+	{
+		"message": "Ongeldige URL"
+	},
+	"Datasaved":
+	{
+		"message": "Opgeslagen"
+	},
+	"Downloadlaunchedonyourserver":
+	{
+		"message": "Download gestart op de server"
+	},
+	"Unabletoreachyourserver":
+	{
+		"message": "Geen verbinding met de server"
+	},
+	"Unabletolaunchthedownload":
+	{
+		"message": "Kan de download niet starten op de server"
+	},
+	"UnabletoretrievetrueYouTubevideoURL":
+	{
+		"message": "Kan de video URL van YouTube niet verkrijgen"
+	},
+	"ReturnedGIDisnullIsAria2crunningasadaemon":
+	{
+		"message": "Server gaf geen GID terug! Staat Aria2c aan als een daemon?"
+	},
+	"NoresponsefromocDownloaderonyourserverPleasecheckthesettings":
+	{
+		"message": "Geen antwoord van ocDownloader. Kijk de instellingen na"
+	},
+	"DownloadWithocDownloader":
+	{
+		"message": "Downloaden met ocDownloader"
+	},
+	"VersionOK":
+	{
+		"message": "Versie van ocDownloader is in orde"
+	},
+	"VersionNOK":
+	{
+		"message": "De geinstalleerde versie van ocDownloader komt niet overeen met de versie van de Addon. Installeer de laatste versie van ocDownloader op de server"
+	}
+}
