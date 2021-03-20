@@ -1,0 +1,25 @@
+{
+  "name": "ocdownloader_webextension",
+  "version": "1.6.1",
+  "description": "A Chromium- and Firefox-compatible extension to add downloads to ocDownloader directly form your browser",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e-alfred/ocDownloader_webextension.git"
+  },
+  "author": "e-alfred",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/e-alfred/ocDownloader_webextension/issues"
+  },
+  "homepage": "https://github.com/e-alfred/ocDownloader_webextension#readme"
+}
