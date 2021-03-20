@@ -60,32 +60,30 @@ function saveConnectionData(url, username, password) {
                 Username: username,
                 Passwd: password,
             }, () => {
-                const XHR = new XMLHttpRequest();
-                XHR.open('POST', ocUrl(url, 'version'), true);
-                XHR.setRequestHeader('OCS-APIREQUEST', 'true');
-                XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                XHR.setRequestHeader('Authorization', `Basic ${btoa(`${username}:${password}`)}`);
-                XHR.onreadystatechange = () => {
-                    if (XHR.readyState === 4) {
-                        try {
-                            const OCS = JSON.parse(XHR.responseText);
 
-                            if (XHR.status === 200) {
-                                if (OCS.RESULT) {
-                                    notifyMe(chrome.i18n.getMessage('VersionOK'));
-                                } else {
-                                    notifyMe(chrome.i18n.getMessage('VersionNOK'));
-                                }
-                            } else {
-                                notifyMe(chrome.i18n.getMessage('Unabletoreachyourserver'));
-                            }
-                        } catch (E) {
-                            notifyMe(chrome.i18n.getMessage('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
-                            console.log(E.message); // eslint-disable-line no-console
+
+                // TODO: Headers, Url, body
+                fetch(ocUrl(url, 'version'), {
+                    headers: {
+                        'OCS-APIREQUEST': 'true',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
+                    },
+                    body: `AddonVersion=${neededApiVersion}`,
+                })
+                    .then(res => res.json()).then(r => {
+                        if (!res.ok) {
+                            notifyMe(chrome.i18n.getMessage('Unabletoreachyourserver'));
+                            return;
                         }
-                    }
-                };
-                XHR.send(`AddonVersion=${neededApiVersion}`);
+
+                        notifyMe(chrome.i18n.getMessage(res.body.RESULT ? 'VersionOK' : 'VersionNOK'));
+
+                    })
+                    .catch(e => {
+                        notifyMe(chrome.i18n.getMessage('NoresponsefromocDownloaderonyourserverPleasecheckthesettings'));
+                        console.log(e); // eslint-disable-line no-console
+                    })
             });
         }
     }
